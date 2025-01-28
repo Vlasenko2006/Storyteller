@@ -1,0 +1,17 @@
+name: story_gen
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - pytorch=1.10
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=11.3
+  - tqdm
+  - scikit-learn
+  - numpy
+  - pyyaml
+  - pip
+  - pip:
+      - wikipedia-api
