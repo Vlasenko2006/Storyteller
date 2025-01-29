@@ -130,7 +130,7 @@ conda activate story_gen
 Once the environment is activated, you can run the script:
 
 ```bash
-python your_script_name.py
+python story_telling_nn.py
 ```
 
 ---
