@@ -4,7 +4,7 @@ import torch.nn as nn
 
 
 class NextWordPredictor(nn.Module):
-    def __init__(self, vocab_size, embed_size= 3 * 512, hidden_size=256, ff_hidden_size=512, num_ff_layers=4, predict_steps=6, dropout=0.3, use_batchnorm=True):
+    def __init__(self, vocab_size, embed_size= 3 * 512, hidden_size=256, ff_hidden_size=512, num_ff_layers=4, predict_steps=6, dropout=dropout, use_batchnorm=True):
         """
         A neural network model to predict the next words in a sequence.
 

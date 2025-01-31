@@ -1,0 +1,13 @@
+seed_text = [["charles_darwin in his book", "this philosophy is really"]]
+seed_text = seed_text + [["charles darwin together with little red riding hood", "In the dark forest they met"]]
+seed_text = seed_text + [["once lenin and and stalin went together", "It was not a big mystery that"]]
+seed_text = seed_text + [["one wise guy said that", "however, it was not clear that"]]
+seed_text = seed_text + [["little red riding hood was too", "but she did a lot of effort to"]]
+seed_text = seed_text + [["the idea of philosophy is", "the modern science considers it as"]]
+seed_text = seed_text + [["in the early twentieth century, it was suggested that", "however, the proof of the concept showed"]]
+seed_text = seed_text + [["mathematics is one of",  "if it is not true"]]
+seed_text = seed_text + [["the story begins with", "what comes next"]]
+seed_text = seed_text + [["to prove the mathematical concept", "science gives answer"]]
+seed_text = seed_text + [["once ancient greeks met charles darvin", "he gave them an answer on"]]
+seed_text = seed_text + [["when ndustrial revolution came into the game of thrones", "this resulted in the development of"]]
+seeders = seed_text
