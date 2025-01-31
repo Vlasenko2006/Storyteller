@@ -9,5 +9,5 @@ seed_text = seed_text + [["mathematics is one of",  "if it is not true"]]
 seed_text = seed_text + [["the story begins with", "what comes next"]]
 seed_text = seed_text + [["to prove the mathematical concept", "science gives answer"]]
 seed_text = seed_text + [["once ancient greeks met charles darvin", "he gave them an answer on"]]
-seed_text = seed_text + [["when ndustrial revolution came into the game of thrones", "this resulted in the development of"]]
+seed_text = seed_text + [["when the industrial revolution came into the game of thrones", "this resulted in the development of"]]
 seeders = seed_text
