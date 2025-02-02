@@ -3,7 +3,7 @@
 ## In simple words
 Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. This neural network is programmed to generate similar whimsical answers just for entertainment. Start a sentence, and watch as it spins out an amusing narrative as long as you like, punctuating where necessary.
 
-Although the neural network is trained on a corpus of Wikipedia articles, it must generate connected, logically coherent, reasonable text **WITHOUT CITING** (!!!) pieces from these articles. The network successfully generates the text if a layman in the subject would believe it. The network fails if it outputs nonsense or a quote from a Wikipedia article!
+Although the neural network is trained on a corpus of Wikipedia articles, it must generate connected, logically coherent, reasonable text **WITHOUT CITING** (!!!) pieces from these articles. Consider the network successfully generates the text if a layman in the subject would believe it, and it fails if it outputs nonsense or a quote from a Wikipedia article!
 
 A special parameter “smoothing” regulates the intellectual content of the generated text. The network trained with small “smoothing” values returns “academic” texts, while the large values make it like a “schoolboy” answer.
 
