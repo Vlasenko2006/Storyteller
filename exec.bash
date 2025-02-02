@@ -19,4 +19,4 @@
 
 
 
-srun #specify your path to python story_telling_nn.py #Lang5_self_long.py
+srun #specify your path to python story_telling_nn.py 
