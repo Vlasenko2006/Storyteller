@@ -66,7 +66,7 @@ def my_trainer(nepochs,
         # Save model checkpoint
         torch.save(
             model.state_dict(),
-            f"{path}/story_telling_final-{predicted_steps}_ep_{epoch}.pth"
+            f"{path}/story_telling-{predicted_steps}_ep_{epoch}.pth"
         )
 
         # Predict and print sequences every 5 epochs
