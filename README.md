@@ -8,7 +8,7 @@ Although the neural network is trained on a corpus of Wikipedia articles, it mus
 A special parameter “smoothing” regulates the intellectual content of the generated text. The network trained with small “smoothing” values returns “academic” texts, while the large values make it like a “schoolboy” answer.
 
 ## Examples 
-Below are examples of the generated text with specified smoothing values. Note ```Smoothing = 0``` corresponds to highly intelligent text, ```Smoothing = 0.1``` corresponds to highly intelligent text.  Seeded text in bold. The training is still going on and the current model output may have some roughness in the texts. However, it gives you a flavor of the network's capabilities.
+Find the examples of the generated text with specified smoothing values below. Note that ```Smoothing = 0``` should correspond to the highly intelligent text, ```Smoothing = 0.1``` should correspond to the schoolboy text. Seeded text in bold. The training is ongoing, and the current model output may have some roughness in the texts. However, it gives you a flavor of the network's capabilities.
 
 ### Smoothing = 0.01.
 1.  **In the early twentieth century, it was suggested that**```to develop a consistent understanding of the fundamental concepts of mathematics, it was sufficient to study observation. For example, a single electron in an unexcited atom is classically depicted as a particle moving in a circular path around the atomic nucleus...```
