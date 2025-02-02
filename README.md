@@ -1,16 +1,39 @@
 # Neural Network for Story Generation
 
+## In simple words
+Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. This neural network is programmed to generate similar whimsical answers just for entertainment. Start a sentence, and watch as it spins out an amusing narrative as long as you like, punctuating where necessary.
+
+Although the neural network is trained on a corpus of Wikipedia articles, it must generate connected, logically coherent, reasonable text **WITHOUT CITING** (!!!) pieces from these articles. The network successfully generates the text if a layman in the subject would believe it. The network fails if it outputs nonsense or a quote from a Wikipedia article!
+
+A special parameter “smoothing” regulates the intellectual content of the generated text. The network trained with small “smoothing” values returns “academic” texts, while the large values make it like a “schoolboy” answer.
+
+## Examples 
+Below are examples of the generated text with specified smoothing values. Note ```Smoothing = 0``` corresponds to highly intelligent text, ```Smoothing = 0.1``` corresponds to highly intelligent text.  Seeded text in bold. The training is still going on and the current model output may have some roughness in the texts. However, it gives you a flavor of the network's capabilities.
+
+### Smoothing = 0.01.
+1.  **In the early twentieth century, it was suggested that**```to develop a consistent understanding of the fundamental concepts of mathematics, it was sufficient to study observation. For example, a single electron in an unexcited atom is classically depicted as a particle moving in a circular path around the atomic nucleus...```
+2.  **Charles_darwin in his book** ```The Road to Serfdom (1944), Friedrich Hayek (1899–1992) asserted that the free-market understanding of economic freedom as present in capitalism is a requisite of political freedom. This philosophy is really sent to think that are said to be true of the evil trait that is very possible for it. Although many slaves have escaped or have been freed since 2007, as of 2012, only one slave owner had been sentenced to serve time in prison.```
+3.  **The idea of philosophy is** ```a source of academic discussion. ```
+4.  **The story begins with** ```a chapter on the island of Thrinacia, with the crew overriding odysseus's wishes to remain away from the island. ```
+5.  **Mathematics is one of** ```is one of the most important forms of philosophical knowledge.``` 
+
+### Smoothing = 0.025.
+1. **In the early twentieth century, it was suggested that**``` the chinese crossbow was transmitted to the roman world on such occasions, although the greek gastraphetes provides an alternative origin.``` (My comment: gastraphetes is an acient greek crossbow)
+2. **Charles_darwin in his book** ```The Road to Serfdom (1944), friedrich hayek (1899–1992) asserted that the free-market understanding of economic freedom as present in capitalism is a requisite of political freedom. This philosophy is really not 206 and stated that it is good for the consequences of actions.```
+3. **The idea of philosophy is** ```a myth. ```
+4. **The story begins with** ```a chapter on the Islands of Weathertop, and is known as Five Years.```
+5. **Mathematics is one of** ```the most important aspects of the argues of the mathematicians. ```
+
+---
+   
 ## Overview
-This project implements a neural network model to predict the next words in a sequence, enabling it to generate text that continues an input seed text. The model is trained on a text corpus, tokenized, and converted into numerical sequences for learning. The architecture uses embeddings, LSTMs, and feed-forward layers to predict multiple next words in a sequence.
+
+This neural network predicts the next words in a sequence, enabling it to generate text that continues an input seed text. The model is trained on a text corpus, tokenized, and converted into numerical sequences for learning. The architecture uses embeddings, LSTMs, and feed-forward layers to predict multiple next words in a sequence.
 
 This neural network (NN) predicts the following words in a text sequence (incomplete sentence). It accepts a phrase and continues it as long as needed, setting appropriate punctuation. The purpose of this NN is:  
 1. Test whether a NN can instantly fool the software aimed to detect AI-generated texts.
 2. A demonstrative and simple example of natural language processing NN
 3. Entertain. The NN produces funny stories, making you think if this is real.
-
-Here is an example of a NN-generated story:
-
-``` In the early twentieth century, it was suggested that to develop a consistent understanding of the fundamental concepts of mathematics, it was sufficient to study observation. For example, a single electron in an unexcited atom is classically depicted as a particle moving in a circular path around the atomic nucleus, whereas in quantum mechanics it is described by a static wave function surrounding the nucleus. For example, the electron wave function for an unexcited hydrogen atom is a spherically symmetric function known as the s-orbital (Fig.```
 
 ## How it works:
 
