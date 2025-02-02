@@ -44,10 +44,10 @@ num_words = 30
 validate_after_nepochs = 1
 
 # Paths and constants
-path = "/gpfs/work/vlasenko/07/NN/Darwin/"
+path = # Specify the path where your corpus and outptu data should be 
 predicted_steps = 1
 load_epoch = 9
-checkpoint_path = f"{path}/story_telling_final-{predicted_steps}_ep_{load_epoch}.pth"
+checkpoint_path = f"{path}/story_telling-{predicted_steps}_ep_{load_epoch}.pth"
 
 # Load and preprocess text corpus
 with open(f"{path}Darwin_biogr_list_large", "rb") as fp:
