@@ -75,6 +75,9 @@ The **NextWordPredictor** model is designed to handle multi-word predictions and
 - **Custom Weight Initialization**:
   - Xavier initialization is used for weights, and biases are initialized to zero for better convergence.
 
+ ## LSTM or Attention layer?
+ Modern natural language processing tool developers prefer attention layers, or combining attention layers with LSTM to pure LSTM. However, to outperform LSTM, the attention layers require quite a large training set, which is not the Storyteller case. 
+
 ### 4. **Loss Function**
 The model uses two loss functions. The first loss is 1A custom loss function (`multi_word_loss`). It computes the average cross-entropy across the predicted steps. It is quite conventional for natural language processing neural networks.
 
