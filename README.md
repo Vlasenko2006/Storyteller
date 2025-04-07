@@ -5,7 +5,7 @@ Picture a teacher asking an unprepared student who isn't particularly studious b
 
 Although the neural network is trained on a corpus of Wikipedia articles, it must generate connected, logically coherent, reasonable text **WITHOUT CITING** (!!!) pieces from these articles. Consider the network successfully generates the text if a layman in the subject would believe it, and it fails if it outputs nonsense or a quote from a Wikipedia article!
 
-A special parameter “smoothing” regulates the intellectual content of the generated text. The network trained with small “smoothing” values returns “academic” texts, while the large values make it like a “schoolboy” answer.
+A special parameter “smoothing” (do not confuse with the temperature) regulates the intellectual content of the generated text. The network trained with small “smoothing” values returns “academic” texts, while the large values make it like a “schoolboy” answer.
 
 ## Examples 
 Find the examples of the generated text with specified smoothing values below. Note that ```Smoothing = 0``` should correspond to the highly intelligent text, ```Smoothing = 0.1``` should correspond to the schoolboy text. Seeded text in bold. The training is ongoing, and the current model output may have some roughness in the texts. However, it gives you a flavor of the network's capabilities.
@@ -23,6 +23,9 @@ Find the examples of the generated text with specified smoothing values below. N
 3. **The idea of philosophy is** ```a myth. ```
 4. **The story begins with** ```a chapter on the Islands of Weathertop, and is known as Five Years.```
 5. **Mathematics is one of** ```the most important aspects of the argues of the mathematicians. ```
+
+## Challenge:
+Since I am limited in computational resourses, the stotyteller must be trained on a single old GPU in reasonable time (days). 
 
 ---
    
@@ -76,7 +79,8 @@ The **NextWordPredictor** model is designed to handle multi-word predictions and
   - Xavier initialization is used for weights, and biases are initialized to zero for better convergence.
 
  ## LSTM or Attention layer?
- Modern natural language processing tool developers prefer attention layers, or combining attention layers with LSTM to pure LSTM. However, to outperform LSTM, the attention layers require quite a large training set, which is not the Storyteller case. 
+ Modern natural language processing tool developers prefer attention layers, or combining attention layers with LSTM to pure LSTM. However, to outperform LSTM, the attention layers require quite a large training set, which is not the Storyteller case (I train it only on 130  
+Wikipedia articles). 
 
 ### 4. **Loss Function**
 The model uses two loss functions. The first loss is 1A custom loss function (`multi_word_loss`). It computes the average cross-entropy across the predicted steps. It is quite conventional for natural language processing neural networks.
