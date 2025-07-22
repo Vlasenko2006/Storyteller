@@ -10,122 +10,109 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import pickle
-from Tokenizer import Tokenizer
-from TextDataset import TextDataset
-from NextWordPredictor import NextWordPredictor
-from collate_fn import collate_fn
+from Tokenizer import TransformerTokenizer
+from TextDataset import TransformerTextDataset, transformer_collate_fn
 from LabelSmoothingLoss import LabelSmoothingLoss
 from my_trainer import my_trainer
 from seeders import seeders
 from final_text import final_text
+from model import MiniBertForNextWordPrediction 
+import yaml 
 
-# Flags for optional features 
-use_adamw = True  # Use AdamW instead of Adam
-alternate_costs = True  # Apply Label Smoothing
-train_the_model = True
-load_model = True
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# Network Settings 
-batch_size = 10 * 4 * 16
-embed_size = 3 * 512
-hidden_size = 4 * 256
-ff_hidden_size = 4 * 256
-num_ff_layers = 4
-dropout = 0.00
+# Load config
+yaml_path = "config/conf.yaml"
+with open(yaml_path, 'r') as f:
+        config = yaml.safe_load(f)
+    
+# Unpack config
+model_cfg = config['model']
+training_cfg = config['training']
+predictor_cfg = config['predictor']
+path = config['path']
+predicted_steps = config['predicted_steps']
+load_epoch = config['load_epoch']
+checkpoint_path = config['checkpoint_path']
 
-# Training settings
-lr_ce = 0.0001 * 0.25 * 0.025 * 0.25
-lr_ls = 0.0001 * 0.25
-smoothing = 0.005
-nepochs = 1000
-
-# Predictor settings
-num_words = 30
-validate_after_nepochs = 1
-
-# Paths and constants
-path = # Specify the path where your corpus and outptu data should be 
-predicted_steps = 1
-load_epoch = 9
-checkpoint_path = f"{path}/story_telling-{predicted_steps}_ep_{load_epoch}.pth"
+use_adamw = config['use_adamw']
+alternate_costs = config['alternate_costs']
+train_the_model = config['train_the_model']
+load_model = config['load_model']
 
 # Load and preprocess text corpus
-with open(f"{path}Darwin_biogr_list_large", "rb") as fp:
+with open(f"{path}test", "rb") as fp:
     corpus = pickle.load(fp)  
 
-tokenizer = Tokenizer()
-preprocessed_corpus = [tokenizer.preprocess_text(line) for line in corpus]
-tokenizer.fit_on_texts(preprocessed_corpus)
-total_words = len(tokenizer.word_index) + 1
+tokenizer = TransformerTokenizer(max_length=model_cfg['max_length'])
+total_words = tokenizer.vocab_size + 1
 
 # Create dataset and DataLoader
-dataset = TextDataset(corpus, tokenizer)
+dataset = TransformerTextDataset(
+    corpus, 
+    tokenizer, 
+    max_length=model_cfg['max_length'], 
+    predict_steps=predicted_steps
+)
 train_loader = DataLoader(
     dataset,
-    batch_size=batch_size,
+    batch_size=training_cfg['batch_size'],
     shuffle=True,
-    collate_fn=collate_fn
+    collate_fn=transformer_collate_fn
 )
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
-model = NextWordPredictor(
+# Model instantiation using **kwargs from model config
+model = MiniBertForNextWordPrediction(
     vocab_size=total_words,
-    embed_size=embed_size,
-    hidden_size=hidden_size,
-    ff_hidden_size=ff_hidden_size,
-    num_ff_layers=num_ff_layers,
-    predict_steps=predicted_steps,
-    dropout=dropout
+    **model_cfg
 )
 
-
-
-criterion_ls = LabelSmoothingLoss(classes=total_words, smoothing=smoothing)
+criterion_ls = LabelSmoothingLoss(classes=total_words, smoothing=training_cfg['smoothing'])
 criterion_ce = nn.CrossEntropyLoss()
 
 # --- Optimizer (AdamW or Adam) ---
 if use_adamw:
-    optimizer_ce = torch.optim.AdamW(model.parameters(), lr=lr_ce)
-    optimizer_ls = torch.optim.AdamW(model.parameters(), lr=lr_ls)
+    optimizer_ce = torch.optim.AdamW(model.parameters(), lr=training_cfg['lr_ce'])
+    optimizer_ls = torch.optim.AdamW(model.parameters(), lr=training_cfg['lr_ls'])
+    optimizer = optimizer_ce
 else:
-    optimizer_ce = torch.optim.Adam(model.parameters(), lr=lr_ce)
-    optimizer_ls = torch.optim.Adam(model.parameters(), lr=lr_ls)
-
+    optimizer_ce = torch.optim.Adam(model.parameters(), lr=training_cfg['lr_ce'])
+    optimizer_ls = torch.optim.Adam(model.parameters(), lr=training_cfg['lr_ls'])
+    optimizer = optimizer_ce
 
 # Load model checkpoint if required
-
 if load_model:
     print("Loading checkpoint: ", checkpoint_path)
-    checkpoint = torch.load(checkpoint_path, map_location=torch.device('cpu'))
-    model.load_state_dict(checkpoint)                      #FIXME Apparently the model does not load optimizer settings. This must be fixed by next commit
-   
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    optimizer_ce = optimizer
     start_epoch = checkpoint.get("epoch", 0) + 1           
 else:
     start_epoch = 0  # Train from scratch
 
-
 model.to(device)  
-
 
 if train_the_model:
     my_trainer(
-        nepochs,
-        path,
-        alternate_costs,
-        criterion_ce,
-        criterion_ls,
-        optimizer_ce,
-        optimizer_ls,
-        model,
-        train_loader,
-        tokenizer,
+        nepochs=training_cfg['nepochs'],
+        path=path,
+        alternate_costs=alternate_costs,
+        criterion_ce=criterion_ce,
+        criterion_ls=criterion_ls,
+        optimizer_ce=optimizer_ce,
+        optimizer_ls=optimizer_ls,
+        model=model,
+        train_loader=train_loader,
+        tokenizer=tokenizer,
         device=device,
-        predicted_steps=1,
-        validate_after_nepochs=validate_after_nepochs,
+        predicted_steps=predicted_steps,
+        validate_after_nepochs=predictor_cfg['validate_after_nepochs'],
         seeders=seeders,
-        start_epoch = start_epoch
+        start_epoch=start_epoch
     )
 else:
     assert load_model, "To validate only you must set load_model to 'True' and specify the loading checkpoint!"
@@ -134,7 +121,7 @@ else:
             seeder,
             model,
             tokenizer,
-            num_words=100,
+            num_words=predictor_cfg['num_words'],
             device=device
         )
         print(f"{index}: {text[0]}")
