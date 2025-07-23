@@ -10,8 +10,9 @@ import torch
 from transformers import AutoTokenizer
 
 class TransformerTokenizer:
-    def __init__(self, max_length=128, pretrained_model_name="bert-base-uncased"):
-        self.tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name)
+    def __init__(self, max_length=128, pretrained_model_path_or_name="bert-base-uncased"):
+        self.tokenizer = AutoTokenizer.from_pretrained(pretrained_model_path_or_name)
+        self.max_length = max_length
         self.max_length = max_length
 
     def preprocess_text(self, text):
