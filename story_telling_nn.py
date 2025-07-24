@@ -16,14 +16,14 @@ from LabelSmoothingLoss import LabelSmoothingLoss
 from my_trainer import my_trainer
 from seeders import seeders
 from final_text import final_text
-from model import MiniBertForNextWordPrediction 
+from model import MiniBertForNextWordPrediction, MiniTransformerWithEncoderDecoder 
 import yaml 
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Load config
-yaml_path = "config/conf_lr.yaml"
+yaml_path = "config/conf.yaml"
 with open(yaml_path, 'r') as f:
         config = yaml.safe_load(f)
     
@@ -43,7 +43,7 @@ load_model = config['load_model']
 
 
 # Load and preprocess text corpus
-with open(f"{path}text", "rb") as fp:
+with open(f"{path}test", "rb") as fp:
     corpus = pickle.load(fp)  
 
 tokenizer = TransformerTokenizer(max_length=model_cfg['max_length'],
@@ -55,8 +55,10 @@ dataset = TransformerTextDataset(
     corpus, 
     tokenizer, 
     max_length=model_cfg['max_length'], 
-    predict_steps=predicted_steps
+    predict_steps=predicted_steps,
+    for_encoder_decoder = ( config["model_type"] == "BART" )
 )
+
 train_loader = DataLoader(
     dataset,
     batch_size=training_cfg['batch_size'],
@@ -67,10 +69,17 @@ train_loader = DataLoader(
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Model instantiation using **kwargs from model config
-model = MiniBertForNextWordPrediction(
-    vocab_size=total_words,
-    **model_cfg
-)
+if config["model_type"] == "BERT":
+    model = MiniBertForNextWordPrediction(
+        vocab_size=total_words,
+        **model_cfg
+    )
+    
+if config["model_type"] == "BART":
+    model =MiniTransformerWithEncoderDecoder(
+        vocab_size=total_words,
+        **model_cfg
+    )
 
 criterion_ls = LabelSmoothingLoss(classes=total_words, smoothing=training_cfg['smoothing'])
 criterion_ce = nn.CrossEntropyLoss()
