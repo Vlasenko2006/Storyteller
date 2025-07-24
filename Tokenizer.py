@@ -17,6 +17,8 @@ class TransformerTokenizer:
 
     def preprocess_text(self, text):
         """Apply any text preprocessing (customize as needed)."""
+        if isinstance(text, list):
+            text = " ".join(str(t) for t in text)
         return text.strip()
 
     def encode(self, text, truncation=True, padding="max_length", max_length=None):

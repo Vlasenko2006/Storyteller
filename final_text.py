@@ -20,37 +20,46 @@ def clean_and_format_text(text):
         formatted_text.append(paragraph)
     return formatted_text
 
-def final_text(seeder, model, tokenizer, num_words=100, device="cpu"):
-    model.eval()
-    c = 1
-    seed_text = seeder[0]
-    with torch.no_grad():
+def final_text(seeder, model, tokenizer, num_words=100, device='cpu', model_type="BERT"):
+    # If seeder is a list, join into a single string
+    if isinstance(seeder, list):
+        seeder = " ".join(str(t) for t in seeder)
+    gen_text = ""
+    if model_type == "BART":
+        # Prepare encoder input (src) and decoder input (tgt)
+        src = tokenizer.encode(seeder, truncation=True, padding="max_length")
+        src_input_ids = torch.tensor([src["input_ids"]], device=device)
+        src_attention_mask = torch.tensor([src["attention_mask"]], device=device)
+        
+        # Start decoder input with BOS or pad token
+        tgt_input_ids = torch.tensor([[tokenizer.tokenizer.pad_token_id]], device=device)
+        tgt_attention_mask = torch.ones_like(tgt_input_ids, device=device)
+        
+        outputs = []
         for _ in range(num_words):
-            # Prepare input_ids and attention_mask via tokenizer
-            inputs = tokenizer.prepare_inference_inputs(seed_text)
-            input_ids = inputs["input_ids"].to(device)
-            attention_mask = inputs["attention_mask"].to(device)
-
-            # Model forward (handles both [batch, vocab] and [batch, steps, vocab])
-            output = model(input_ids, attention_mask=attention_mask)
-            if output.dim() == 3:
-                # [batch, steps, vocab], take the last step
-                output = output[:, -1, :]
-
-            # Get predicted token id (highest probability)
-            predicted_token_id = output.argmax(-1).item()
-            predicted_word = tokenizer.decode([predicted_token_id]).strip()
-
-            # Stop if unknown word, padding, or EOS
-            if predicted_word.lower() in ["nan", tokenizer.tokenizer.eos_token, tokenizer.tokenizer.pad_token]:
-                break
-
-            # Append predicted word to the seed text
-            if predicted_word == "." and len(seeder) > c:
-                seed_text += " " + predicted_word + " " + seeder[c]
-                c += 1
-            else:
-                seed_text += " " + predicted_word
-
-    text = clean_and_format_text([seed_text])
-    return text
+            logits = model(
+                src_input_ids,
+                tgt_input_ids,
+                src_attention_mask=src_attention_mask,
+                tgt_attention_mask=tgt_attention_mask,
+            )
+            next_token_id = logits[:, -1, :].argmax(-1, keepdim=True)
+            outputs.append(next_token_id.item())
+            tgt_input_ids = torch.cat([tgt_input_ids, next_token_id], dim=1)
+            tgt_attention_mask = torch.ones_like(tgt_input_ids, device=device)
+        gen_text = tokenizer.decode(outputs)
+    else:
+        # BERT style (single input, next-word prediction)
+        encoded = tokenizer.prepare_inference_inputs(seeder)
+        input_ids = encoded["input_ids"].to(device)
+        attention_mask = encoded["attention_mask"].to(device)
+        outputs = []
+        for _ in range(num_words):
+            logits = model(input_ids, attention_mask=attention_mask)
+            next_token_id = logits.argmax(-1, keepdim=True)
+            outputs.append(next_token_id.item())
+            input_ids = torch.cat([input_ids, next_token_id], dim=1)
+            attention_mask = torch.cat([attention_mask, torch.ones_like(next_token_id)], dim=1)
+        gen_text = tokenizer.decode(outputs)
+    # Prepend the seeder to the generated text for clarity
+    return [f"{seeder} {gen_text}"]

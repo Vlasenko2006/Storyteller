@@ -3,6 +3,13 @@ from tqdm import tqdm
 from multi_word_loss import multi_word_loss
 from final_text import final_text
 
+def limited_batches_loader(loader, n_batches):
+    """Yield only the first n_batches from loader, then stop."""
+    for i, batch in enumerate(loader):
+        if i >= n_batches:
+            break
+        yield batch
+
 def my_trainer(
     nepochs,
     path,
@@ -20,10 +27,16 @@ def my_trainer(
     seeders=["NaN"],
     start_epoch=0,
     grad_accum_steps=1,
-    model_type="BERT"  # NEW: could be "BERT" or "BART"
+    model_type="BERT",  # NEW: could be "BERT" or "BART"
+    DEBUG_FIRST_N_BATCHES = None
 ):
     text = ["NaN"]
     for epoch in range(start_epoch, nepochs):
+        # --- DEBUG option: wrap loader in a generator for every epoch ---
+        if DEBUG_FIRST_N_BATCHES:
+            epoch_train_loader = limited_batches_loader(train_loader, DEBUG_FIRST_N_BATCHES)
+        else:
+            epoch_train_loader = train_loader
 
         if alternate_costs:
             if epoch % 2 == 1: 
@@ -38,7 +51,8 @@ def my_trainer(
 
         model.train()
         epoch_loss = 0
-        progress_bar = tqdm(train_loader, desc=f"Epoch {epoch + 1}")
+        batch_count = 0
+        progress_bar = tqdm(epoch_train_loader, desc=f"Epoch {epoch + 1}")
 
         optimizer.zero_grad()
         for step, batch in enumerate(progress_bar):
@@ -49,19 +63,13 @@ def my_trainer(
                 tgt_attention_mask = batch["tgt_attention_mask"].to(device)
                 labels = batch["labels"].to(device)
 
-                # Forward pass
                 logits = model(
                     src_input_ids, tgt_input_ids,
                     src_attention_mask=src_attention_mask,
                     tgt_attention_mask=tgt_attention_mask
                 )
 
-                # For CrossEntropy, flatten target and logits
-                loss = multi_word_loss(
-                    logits.view(-1, logits.size(-1)),
-                    labels.view(-1),
-                    criterion
-                )
+                loss = multi_word_loss(logits, labels, criterion)
             else:  # Default: BERT-like
                 X = batch["input_ids"].to(device)
                 attention_mask = batch["attention_mask"].to(device)
@@ -78,9 +86,10 @@ def my_trainer(
                 optimizer.zero_grad()
             
             epoch_loss += loss.item() * grad_accum_steps
+            batch_count += 1
             progress_bar.set_postfix(loss=loss.item() * grad_accum_steps)
 
-        avg_loss = epoch_loss / len(train_loader)
+        avg_loss = epoch_loss / batch_count if batch_count > 0 else float('nan')
         print(f"NN2 Epoch {epoch + 1}, Average Loss: {avg_loss:.4f}")
 
         torch.save(
@@ -96,10 +105,11 @@ def my_trainer(
             for index, seeder in enumerate(seeders, start=1):
                 text = final_text(
                     seeder,
-                    model, 
+                    model,
                     tokenizer,
                     num_words=100,
-                    device=device
+                    device=device,
+                    model_type=model_type  
                 )
                 print(f"{index}: {text[0]}")
                 print("")

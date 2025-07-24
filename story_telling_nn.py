@@ -18,9 +18,15 @@ from seeders import seeders
 from final_text import final_text
 from model import MiniBertForNextWordPrediction, MiniTransformerWithEncoderDecoder 
 import yaml 
+from clean_text import clean_text
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+# --------------------------
+# DEBUGGING OPTION
+DEBUG_FIRST_N_BATCHES = 5  # set to None or 0 to disable
+# --------------------------
 
 # Load config
 yaml_path = "config/conf.yaml"
@@ -46,9 +52,17 @@ load_model = config['load_model']
 with open(f"{path}test", "rb") as fp:
     corpus = pickle.load(fp)  
 
+print(type(corpus))
+# If it's a list
+if isinstance(corpus, list):
+    print(type(corpus[0]))  # e.g., str
+
+
+corpus = clean_text(corpus)
+
 tokenizer = TransformerTokenizer(max_length=model_cfg['max_length'],
                                  pretrained_model_path_or_name = config['pretrained_model_path_or_name'])
-total_words = tokenizer.vocab_size + 1
+total_words = tokenizer.vocab_size # + 1 #FIXME +1 might be an issue
 
 # Create dataset and DataLoader
 dataset = TransformerTextDataset(
@@ -63,7 +77,8 @@ train_loader = DataLoader(
     dataset,
     batch_size=training_cfg['batch_size'],
     shuffle=True,
-    collate_fn=transformer_collate_fn
+    collate_fn=transformer_collate_fn,
+    drop_last=True
 )
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -125,8 +140,10 @@ if train_the_model:
         validate_after_nepochs=predictor_cfg['validate_after_nepochs'],
         seeders=seeders,
         start_epoch=start_epoch,
-        model_type= config["model_type"]
+        model_type= config["model_type"],
+        DEBUG_FIRST_N_BATCHES = DEBUG_FIRST_N_BATCHES
     )
+
 else:
     assert load_model, "To validate only you must set load_model to 'True' and specify the loading checkpoint!"
     for index, seeder in enumerate(seeders, start=1):
