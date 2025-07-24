@@ -32,10 +32,8 @@ class MiniBertForNextWordPrediction(nn.Module):
         last_hidden = x[:, -1, :]  # [batch, embed_size]
         logits = self.fc(last_hidden)
         return logits
-    
-    
-    
 
+    
 class MiniTransformerWithEncoderDecoder(nn.Module):
     def __init__(self, vocab_size, embed_size=128, hidden_size=128, num_layers=2, num_heads=2, dropout=0.1, max_length=128):
         super().__init__()
@@ -88,3 +86,4 @@ class MiniTransformerWithEncoderDecoder(nn.Module):
         # Output head: [batch, tgt_seq_len, vocab_size]
         logits = self.fc(output)
         return logits 
+

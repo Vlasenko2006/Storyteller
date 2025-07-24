@@ -23,7 +23,7 @@ import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Load config
-yaml_path = "config/conf.yaml"
+yaml_path = "config/conf_lr.yaml"
 with open(yaml_path, 'r') as f:
         config = yaml.safe_load(f)
     
@@ -41,11 +41,13 @@ alternate_costs = config['alternate_costs']
 train_the_model = config['train_the_model']
 load_model = config['load_model']
 
+
 # Load and preprocess text corpus
-with open(f"{path}test", "rb") as fp:
+with open(f"{path}text", "rb") as fp:
     corpus = pickle.load(fp)  
 
-tokenizer = TransformerTokenizer(max_length=model_cfg['max_length'])
+tokenizer = TransformerTokenizer(max_length=model_cfg['max_length'],
+                                 pretrained_model_path_or_name = config['pretrained_model_path_or_name'])
 total_words = tokenizer.vocab_size + 1
 
 # Create dataset and DataLoader
@@ -83,23 +85,24 @@ else:
     optimizer_ls = torch.optim.Adam(model.parameters(), lr=training_cfg['lr_ls'])
     optimizer = optimizer_ce
 
+model.to(device)
+
 # Load model checkpoint if required
 if load_model:
+    checkpoint_path_load = os.path.join(checkpoint_path, f"story_telling-{config['predicted_steps']}_ep_{config['load_epoch']}.pth")
     print("Loading checkpoint: ", checkpoint_path)
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path_load, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     optimizer_ce = optimizer
     start_epoch = checkpoint.get("epoch", 0) + 1           
 else:
-    start_epoch = 0  # Train from scratch
-
-model.to(device)  
+    start_epoch = 0  # Train from scratch  
 
 if train_the_model:
     my_trainer(
         nepochs=training_cfg['nepochs'],
-        path=path,
+        path=checkpoint_path,
         alternate_costs=alternate_costs,
         criterion_ce=criterion_ce,
         criterion_ls=criterion_ls,

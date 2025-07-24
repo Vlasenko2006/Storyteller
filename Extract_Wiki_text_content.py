@@ -168,7 +168,7 @@ for topic in topics:
 tlist = tokenize_expressions(texts, unite_sentence=True)
 
 #tlist = [item for sublist in tokenized for item in sublist]
-output_path = "/Users/andreyvlasenko/tst/Storyteller2/corpus/test"
+output_path = "/gpfs/work/vlasenko/07/NN/fatenv/storyteller2/corpus/text"
 
 with open(output_path, "wb") as fp:   #Pickling
     pickle.dump(tlist, fp)

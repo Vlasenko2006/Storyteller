@@ -80,7 +80,7 @@ def my_trainer(
                 'epoch': epoch,
                 # You can add more metadata if needed
             },
-            f"{path}/story_telling-{predicted_steps}_ep_{epoch}.pth"
+            f"{path}/story_telling-lr-{predicted_steps}_ep_{epoch}.pth"
         )
 
         # Predict and print sequences every validate_after_nepochs epochs
