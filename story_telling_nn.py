@@ -124,7 +124,8 @@ if train_the_model:
         predicted_steps=predicted_steps,
         validate_after_nepochs=predictor_cfg['validate_after_nepochs'],
         seeders=seeders,
-        start_epoch=start_epoch
+        start_epoch=start_epoch,
+        model_type= config["model_type"]
     )
 else:
     assert load_model, "To validate only you must set load_model to 'True' and specify the loading checkpoint!"

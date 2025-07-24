@@ -19,28 +19,27 @@ class TransformerTokenizer:
         """Apply any text preprocessing (customize as needed)."""
         return text.strip()
 
-    def encode(self, text, truncation=True, padding="max_length"):
+    def encode(self, text, truncation=True, padding="max_length", max_length=None):
         """
         Encode a single text string into token ids, with padding/truncation.
         Returns a dictionary compatible with transformers models.
         """
         text = self.preprocess_text(text)
+        max_length = max_length if max_length is not None else self.max_length
         return self.tokenizer(
             text,
-            max_length=self.max_length,
+            max_length=max_length,
             truncation=truncation,
             padding=padding,
             return_tensors=None
         )
 
-    def batch_encode(self, texts, truncation=True, padding="max_length"):
-        """
-        Encode a batch of text strings.
-        """
+    def batch_encode(self, texts, truncation=True, padding="max_length", max_length=None):
         texts = [self.preprocess_text(t) for t in texts]
+        max_length = max_length if max_length is not None else self.max_length
         return self.tokenizer(
             texts,
-            max_length=self.max_length,
+            max_length=max_length,
             truncation=truncation,
             padding=padding,
             return_tensors="pt"
