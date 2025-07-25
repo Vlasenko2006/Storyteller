@@ -10,4 +10,8 @@ seed_text = seed_text + [["the story begins with", "what comes next"]]
 seed_text = seed_text + [["to prove the mathematical concept", "science gives answer"]]
 seed_text = seed_text + [["once ancient greeks met charles darvin", "he gave them an answer on"]]
 seed_text = seed_text + [["when the industrial revolution came into the game of thrones", "this resulted in the development of"]]
+seed_text = seed_text + [["What is your name?", "Who is Isaak Newton?"]]
+seed_text = seed_text + [["What is the capital of France?", "What is the temperature of ice melting?"]]
+seed_text = seed_text + [["When lenin was born?", "What is the biggest planet in solar system?"]]
+
 seeders = seed_text

@@ -23,15 +23,17 @@ from clean_text import clean_text
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# --------------------------
-# DEBUGGING OPTION
-DEBUG_FIRST_N_BATCHES = 5  # set to None or 0 to disable
-# --------------------------
 
 # Load config
 yaml_path = "config/conf.yaml"
 with open(yaml_path, 'r') as f:
         config = yaml.safe_load(f)
+
+# --------------------------
+# DEBUGGING OPTION
+DEBUG_FIRST_N_BATCHES = config["DEBUG_FIRST_N_BATCHES"] 
+# --------------------------
+
     
 # Unpack config
 model_cfg = config['model']
@@ -49,8 +51,11 @@ load_model = config['load_model']
 
 
 # Load and preprocess text corpus
-with open(f"{path}test", "rb") as fp:
+with open(f"{path}text", "rb") as fp:
     corpus = pickle.load(fp)  
+
+with open(f"{path}preprocessed_qa_dataset_plain.pkl", "rb") as fp:
+    qa = pickle.load(fp)  
 
 print(type(corpus))
 # If it's a list
@@ -59,6 +64,9 @@ if isinstance(corpus, list):
 
 
 corpus = clean_text(corpus)
+corpus = corpus + qa
+
+
 
 tokenizer = TransformerTokenizer(max_length=model_cfg['max_length'],
                                  pretrained_model_path_or_name = config['pretrained_model_path_or_name'])

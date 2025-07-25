@@ -55,6 +55,10 @@ def final_text(seeder, model, tokenizer, num_words=100, device='cpu', model_type
         attention_mask = encoded["attention_mask"].to(device)
         outputs = []
         for _ in range(num_words):
+            max_length = getattr(tokenizer, "model_max_length", 128)
+            if input_ids.shape[1] > max_length:
+                input_ids = input_ids[:, -max_length:]
+                attention_mask = attention_mask[:, -max_length:]
             logits = model(input_ids, attention_mask=attention_mask)
             next_token_id = logits.argmax(-1, keepdim=True)
             outputs.append(next_token_id.item())
