@@ -27,16 +27,25 @@ def my_trainer(
     seeders=["NaN"],
     start_epoch=0,
     grad_accum_steps=1,
-    model_type="BERT",  # NEW: could be "BERT" or "BART"
-    DEBUG_FIRST_N_BATCHES = None
+    model_type="BERT",
+    DEBUG_FIRST_N_BATCHES = None,
+    ddp_enabled=False,
+    rank=0
 ):
+    import torch.distributed as dist
+
     text = ["NaN"]
     for epoch in range(start_epoch, nepochs):
-        # --- DEBUG option: wrap loader in a generator for every epoch ---
         if DEBUG_FIRST_N_BATCHES:
             epoch_train_loader = limited_batches_loader(train_loader, DEBUG_FIRST_N_BATCHES)
         else:
             epoch_train_loader = train_loader
+
+        # If using DistributedSampler, set epoch for shuffling
+
+        # If using DistributedSampler, set epoch for shuffling
+        #if ddp_enabled and hasattr(train_loader, "sampler") and hasattr(train_loader.sampler, "set_epoch"):
+        #    train_loader.sampler.set_epoch(epoch)
 
         if alternate_costs:
             if epoch % 2 == 1: 
@@ -52,10 +61,14 @@ def my_trainer(
         model.train()
         epoch_loss = 0
         batch_count = 0
-        progress_bar = tqdm(epoch_train_loader, desc=f"Epoch {epoch + 1}")
+
+        # Only rank 0 shows the progress bar
+        iter_obj = tqdm(epoch_train_loader, desc=f"Epoch {epoch + 1}") if (not ddp_enabled or rank == 0) else epoch_train_loader
 
         optimizer.zero_grad()
-        for step, batch in enumerate(progress_bar):
+        for step, batch in enumerate(iter_obj):
+            if ddp_enabled:
+                print(f"Rank {rank} sees batch {step}, batch size: {batch['input_ids'].size(0)}")
             if model_type == "BART":  # Encoder-decoder
                 src_input_ids = batch["src_input_ids"].to(device)
                 src_attention_mask = batch["src_attention_mask"].to(device)
@@ -87,30 +100,40 @@ def my_trainer(
             
             epoch_loss += loss.item() * grad_accum_steps
             batch_count += 1
-            progress_bar.set_postfix(loss=loss.item() * grad_accum_steps)
 
-        avg_loss = epoch_loss / batch_count if batch_count > 0 else float('nan')
-        print(f"NN2 Epoch {epoch + 1}, Average Loss: {avg_loss:.4f}")
+            if (not ddp_enabled or rank == 0) and hasattr(iter_obj, 'set_postfix'):
+                iter_obj.set_postfix(loss=loss.item() * grad_accum_steps)
 
-        torch.save(
-            {
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'epoch': epoch,
-            },
-            f"{path}/story_telling-lr-{predicted_steps}_ep_{epoch}.pth"
-        )
+        # Optionally reduce loss across all ranks for correct average
+        if ddp_enabled:
+            avg_loss_tensor = torch.tensor([epoch_loss], dtype=torch.float32, device=device)
+            torch.distributed.all_reduce(avg_loss_tensor, op=torch.distributed.ReduceOp.SUM)
+            avg_loss = avg_loss_tensor.item() / (batch_count * dist.get_world_size())
+        else:
+            avg_loss = epoch_loss / batch_count if batch_count > 0 else float('nan')
 
-        if (epoch + 1) % validate_after_nepochs == 0:
+        if not ddp_enabled or rank == 0:
+            print(f"NN2 Epoch {epoch + 1}, Average Loss: {avg_loss:.4f}")
+            # Save checkpoint only on rank 0
+            to_save = model.module if ddp_enabled else model
+            torch.save(
+                {
+                    'model_state_dict': to_save.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'epoch': epoch,
+                },
+                f"{path}/story_telling-lr-{predicted_steps}_ep_{epoch}.pth"
+            )
+
+        if ((epoch + 1) % validate_after_nepochs == 0) and (not ddp_enabled or rank == 0):
             for index, seeder in enumerate(seeders, start=1):
                 text = final_text(
                     seeder,
-                    model,
+                    model.module if ddp_enabled else model,
                     tokenizer,
                     num_words=100,
                     device=device,
                     model_type=model_type  
                 )
-                print(f"{index}: {text[0]}")
-                print("")
+                print(f"{index}: {text[0]}\n")
     return text
