@@ -1,4 +1,4 @@
-# Neural Network for Story Generation
+# Neural Networks for Story Generation
 
 ## In simple words
 Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. The neural networks in this project (BERTsky, BARTsky, LSTMsky) are designed to behave in precisely this way, generating whimsical and fanciful responses. In the world of language models, this tendency to confidently produce convincing but untrue information is called “hallucination.” While typically considered a flaw, here it’s exactly what I want: perfect hallucinations—answers that sound plausible, are woven from real facts, yet together never reflect the actual truth.
