@@ -1,7 +1,7 @@
 # Neural Networks for Story Generation
 
 ## In simple words
-Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. The neural networks in this project (BERTsky, BARTsky, LSTMsky) are designed to behave in precisely this way, generating whimsical and fanciful responses. In the world of language models, this tendency to confidently produce convincing but untrue information is called “hallucination.” While typically considered a flaw, here it’s exactly what I want: perfect hallucinations—answers that sound plausible, are woven from real facts, yet together never reflect the actual truth.
+Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. The neural networks that I developed in the scope of this project LSTMsky (currrent branch), and BERTsky, BARTsky (see branch "transformers") are designed to behave in precisely this way, generating whimsical and fanciful responses. In the world of language models, this tendency to confidently produce convincing but untrue information is called “hallucination.” While typically considered a flaw, here it’s exactly what I want: perfect hallucinations—answers that sound plausible, are woven from real facts, yet together never reflect the actual truth.
 
 Although the neural network is trained on a corpus of Wikipedia articles, it must generate connected, logically coherent, reasonable text **WITHOUT DIRECT CITING** (!!!) pieces from these articles. Consider the network successfully generates the text if a layman in the subject would believe it, and it fails if it outputs nonsense or a quote from a Wikipedia article! This kind of language model output is known as halucination and typicaly unwanted in the most of cases, but is highly demanded in this Storyteller project.
 
@@ -25,13 +25,13 @@ Find the examples of the generated text with specified smoothing values below. N
 5. **Mathematics is one of** ```the most important aspects of the argues of the mathematicians. ```
 
 ## Challenge:
-Since I am limited in computational resourses, the stotyteller must be trained on a single old GPU in reasonable time (days). 
+Since I am limited in computational resourses, this storyteller must be trained on a single old GPU in reasonable time (days). 
 
 ---
    
 ## Overview
 
-This neural network predicts the next words in a sequence, enabling it to generate text that continues an input seed text. The model is trained on a text corpus, tokenized, and converted into numerical sequences for learning. The architecture uses embeddings, LSTMs, and feed-forward layers to predict multiple next words in a sequence.
+This neural network, the LSTMsky, is an old-fasioned NLP model with LSTM layer in its core (see also my transformer-based BERTsky and BARTsky). It predicts the next words in the beginning of a sentence (the prompt), enabling it to generate text that continues an input seed text. The model is trained on a text corpus, tokenized words using original tokenizer, and converted into numerical sequences for learning. The architecture uses embeddings, LSTMs, and feed-forward layers. 
 
 This neural network (NN) predicts the following words in a text sequence (incomplete sentence). It accepts a phrase and continues it as long as needed, setting appropriate punctuation. The purpose of this NN is:  
 1. Test whether a NN can instantly fool the software aimed to detect AI-generated texts.
