@@ -31,7 +31,7 @@ Since I am limited in computational resourses, this storyteller must be trained 
    
 ## Overview
 
-This neural network, the LSTMsky, is an old-fasioned NLP model with LSTM layer in its core (see also my transformer-based BERTsky and BARTsky). It predicts the next words in the beginning of a sentence (the prompt), enabling it to generate text that continues an input seed text. The model is trained on a text corpus, tokenized words using original tokenizer, and converted into numerical sequences for learning. The architecture uses embeddings, LSTMs, and feed-forward layers. 
+This neural network, the LSTMsky, is an old-fasioned NLP model with LSTM layer in its core (see also my [trasformer branch](https://github.com/Vlasenko2006/Storyteller/tree/transformer) with transformer-based BERTsky and BARTsky). It predicts the next words in the beginning of a sentence (the prompt), enabling it to generate text that continues an input seed text. The model is trained on a text corpus, tokenized words using original tokenizer, and converted into numerical sequences for learning. The architecture uses embeddings, LSTMs, and feed-forward layers. 
 
 This neural network (NN) predicts the following words in a text sequence (incomplete sentence). It accepts a phrase and continues it as long as needed, setting appropriate punctuation. The purpose of this NN is:  
 1. Test whether a NN can instantly fool the software aimed to detect AI-generated texts.
@@ -83,7 +83,7 @@ Modern natural language processing models increasingly rely on attention mechani
 
 In contrast, LSTM networks are faster to train and more resource-efficient. For short text generation tasks (up to 500 words), pure LSTM architectures can actually outperform their attention-based counterparts, offering a practical and effective solution.
 
-If you’re interested in a hands-on comparison between attention-based and LSTM-based models, check out the **transformer** branch of the Storyteller project, which features models built with attention mechanisms.
+If you’re interested in a hands-on comparison between attention-based and LSTM-based models, check out the [transformer branch](https://github.com/Vlasenko2006/Storyteller/tree/transformer) of the Storyteller project, which features models built with attention mechanisms.
 
 ### 4. **Loss Function**
 The model uses two loss functions. The first loss is 1A custom loss function (`multi_word_loss`). It computes the average cross-entropy across the predicted steps. It is quite conventional for natural language processing neural networks.
