@@ -1,6 +1,6 @@
 # Transformer-based Neural Networks for Story Generation
 
-See also the main barnch with the LSTM-based NLP model.
+See also the [main barnch](https://github.com/Vlasenko2006/Storyteller/tree/main) with the LSTM-based NLP model.
 
 # Storyteller: Neural NLP-Based Story Generator
 
