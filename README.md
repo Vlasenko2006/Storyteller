@@ -2,8 +2,6 @@
 
 See also the [main barnch](https://github.com/Vlasenko2006/Storyteller/tree/main) with the LSTM-based NLP model.
 
-# Storyteller: Neural NLP-Based Story Generator
-
 **Storyteller** is an open-source project aimed at inventing realistic-sounding stories using neural networks and modern natural language processing techniques. The repository features various architectures, including Transformer-based models, and provides tools for generating synthetic texts that can be used for research in text generation, detection of algorithmically generated content, and benchmarking NLP methods.
 
 ## Features
