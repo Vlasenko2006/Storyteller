@@ -1,11 +1,21 @@
 # Neural Networks for Story Generation
 
 ## In simple words
-Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. The neural networks that I developed in the scope of this project LSTMsky (currrent branch), and BERTsky, BARTsky (see branch "transformers") are designed to behave in precisely this way, generating whimsical and fanciful responses. In the world of language models, this tendency to confidently produce convincing but untrue information is called “hallucination.” While typically considered a flaw, here it’s exactly what I want: perfect hallucinations—answers that sound plausible, are woven from real facts, yet together never reflect the actual truth.
+Picture a teacher asking an unprepared student who isn't particularly studious but is highly inventive to answer. He gives fantastically creative but typically wrong answers, entertaining the whole class. The neural networks that I developed in the scope of this project LSTMsky (LSTM-based NLP, currrent branch), and BERTsky, BARTsky (Transformer-based LLMs, see branch "transformers") are designed to behave in precisely this way, generating whimsical and fanciful responses. In the world of language models, this tendency to confidently produce convincing but untrue information is called “hallucination.” While this is usually seen as a flaw, in this case it’s precisely what I want: perfect hallucinations—answers that sound convincing and are constructed from genuine facts, yet, when combined, never represent the actual truth. Unless you are deeply familiar with the subject, you would never notice.
 
 Although the neural network is trained on a corpus of Wikipedia articles, it must generate connected, logically coherent, reasonable text **WITHOUT DIRECT CITING** (!!!) pieces from these articles. Consider the network successfully generates the text if a layman in the subject would believe it, and it fails if it outputs nonsense or a quote from a Wikipedia article! This kind of language model output is known as halucination and typicaly unwanted in the most of cases, but is highly demanded in this Storyteller project.
 
 A special parameter “smoothing” (do not confuse with the temperature) regulates the intellectual content of the generated text. The network trained with small “smoothing” values returns “academic” texts, while the large values make it like a “schoolboy” answer.
+
+## Why LSTM and not Transformers?
+
+While transformer-based NLP models are powerful and I do have them available (see the "transformers" branch), there are compelling reasons to choose LSTM networks in certain scenarios. Transformers generally outperform LSTMs across most tasks, except for one key aspect: their computational cost. Training transformers requires enormous datasets and thousands of GPU-hours, making them prohibitively expensive for many users.
+
+In contrast, LSTM-based NLP models are much more accessible. They can learn language effectively from a relatively small corpus—sometimes as little as 300 Wikipedia articles—and can be trained quickly, even on a CPU. If you're interested in studying the inner workings of NLP, LSTMs are a great starting point: they're fast, cheap, and capable of generating reasonable texts up to 250 tokens in length. However, for longer texts, LSTMs may lose track of the topic and begin to drift.
+
+In summary: start with LSTM if you want an approachable introduction to NLP model training. They’re efficient and practical for small-scale experiments, whereas transformers are best suited for large-scale, resource-intensive projects.
+
+
 
 ## Examples 
 Find the examples of the generated text with specified smoothing values below. Note that ```Smoothing = 0``` should correspond to the highly intelligent text, ```Smoothing = 0.1``` should correspond to the schoolboy text. Seeded text in bold. The training is ongoing, and the current model output may have some roughness in the texts. However, it gives you a flavor of the network's capabilities.
